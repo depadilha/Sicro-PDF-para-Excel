@@ -8,11 +8,17 @@ from openpyxl import Workbook
 
 
 def lines_to_dic(linha, tipo):
-    if tipo == "eq":
+    if tipo == "eq" and linha[-3].replace(",", "").replace(".", "").isnumeric() and \
+                        linha[-4].replace(",", "").replace(".", "").isnumeric():
         return {"Código": linha[0], "Descrição": " ".join(linha[1:-9]), "Valor de Aquisição": linha[-9], "Depreciação":
                 linha[-8], "Oportunidade Capital": linha[-7], "Seguros e Impostos": linha[-6], "Manutenção": linha[-5],
                 "Operação": linha[-4], "Mão de Obra de Operação": linha[-3], "Custo Produtivo": linha[-2],
                 "Custo Improdutivo": linha[-1]}
+    elif tipo == "eq" and not (linha[-3].replace(",", "").replace(".", "").isnumeric() and
+                               linha[-4].replace(",", "").replace(".", "").isnumeric()):
+        return {"Código": linha[0], "Descrição": " ".join(linha[1:-2]), "Valor de Aquisição": "-", "Depreciação": "-",
+                "Oportunidade Capital": "-", "Seguros e Impostos": "-", "Manutenção": "-", "Operação": "-",
+                "Mão de Obra de Operação": "-", "Custo Produtivo": linha[-2], "Custo Improdutivo": linha[-1]}
     elif tipo == "mo":
         return {"Código": linha[0], "Descrição": " ".join(linha[1:-5]), "Unidade": linha[-5], "Salário": linha[-4],
                 "Encargos Totais": linha[-3], "Custo": linha[-2], "Periculosidade": linha[-1]}
@@ -44,7 +50,7 @@ def pdf_to_lines(dir_arq, tipo):
                     if tipo == "eq":
                         if (list2[0][0] == "E" or list2[0][0] == "A") and list2[0][1:5].isnumeric():
                             Dados_Equip.append(lines_to_dic(list2, "eq"))
-                        elif j > 0 and len(Dados_Equip) > 0 and list3[0][0] == "P" and list3[0][1:5].isnumeric():
+                        elif j > 0 and (list3[0][0] == "E" or list3[0][0] == "A") and list3[0][1:5].isnumeric():
                             Dados_Equip[-1]["Descrição"] = Dados_Equip[-1]["Descrição"] + " " + " ".join(list2)
                     elif tipo == "mo":
                         if list2[0][0] == "P" and list2[0][1:5].isnumeric():
